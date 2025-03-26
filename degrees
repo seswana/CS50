@@ -1,0 +1,38 @@
+from collections import deque
+
+def shortest_path(source, target):
+    """
+    Returns the shortest path from source to target.
+    If no path exists, returns None.
+    """
+    # The frontier will store a queue of paths (list of (movie_id, person_id) tuples)
+    frontier = deque([[(None, source)]])  # Start with source actor, no movie yet
+    # A set to keep track of the actors we've already explored
+    explored = set()
+
+    # Perform BFS
+    while frontier:
+        path = frontier.popleft()  # Get the next path in the queue
+        current_person = path[-1][1]  # Get the last person in the current path
+
+        # If we've already explored this person, skip it
+        if current_person in explored:
+            continue
+        
+        # Mark the current person as explored
+        explored.add(current_person)
+
+        # If we reach the target, return the path
+        if current_person == target:
+            return path[1:]  # Exclude the source (first element)
+
+        # Add neighbors (people who starred in movies with current_person) to the frontier
+        for movie_id, neighbor in neighbors_for_person(current_person):
+            # Make sure the neighbor hasn't been explored yet
+            if neighbor not in explored:
+                # Append the new path to the frontier
+                new_path = path + [(movie_id, neighbor)]
+                frontier.append(new_path)
+    
+    # If no path is found, return None
+    return None
